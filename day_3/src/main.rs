@@ -18,11 +18,8 @@ fn produce_graph(s: String, down: usize, right: usize) -> Vec<Vec<bool>> {
     let mut vvc: Vec<Vec<char>> = vec![vec![]];
     let mut vvb: Vec<Vec<bool>> = vec![vec![]];
 
-    // not space efficient, makes a square
     let region_width = s.lines().nth(0).unwrap().chars().count();
     let region_height = s.lines().count();
-    println!("rh{:?}", region_height);
-    println!("rw{:?}", region_width);
 
     // if the amount we go down is less than the width than the region is already big enough
     // else the worst case we go right on every single row, make vec that big
@@ -30,7 +27,7 @@ fn produce_graph(s: String, down: usize, right: usize) -> Vec<Vec<bool>> {
         true => 1,
         false => (right as f32 * region_height as f32 / region_width as f32).ceil() as usize
     };
-    println!("w: {}", total_width);
+
     s.lines().for_each(|l| vvc.push(l.chars().collect()));
 
     for vc in vvc {
