@@ -28,6 +28,7 @@ fn main() {
         let mut valid = true;
         let passport = passport.replace('\n', " ");
         let passport: Vec<&str> = passport.split_ascii_whitespace().collect();
+        let mut seen: (bool, bool, bool, bool, bool, bool, bool) = (false, false, false, false, false, false, false);
         for field in passport {
             let kv: Vec<&str> = field.split(':').collect();
             let k = kv[0];
@@ -36,11 +37,12 @@ fn main() {
                 "byr" => {
                     let t = v.parse::<u16>(); // may need to catch exceptions here
                     match t {
-                        Ok(x) => if x < 1920 || x > 2020 {
+                        Ok(x) => if x < 1920 || x > 2002 {
                             valid = false;
                         },
                         Err(_) => valid = false
                     };
+                    seen.0 = true;
                 },
                 "iyr" => {
                     let t = v.parse::<u16>(); 
@@ -50,6 +52,7 @@ fn main() {
                         },
                         Err(_) => valid = false
                     };
+                    seen.1 = true;
                 },
                 "eyr" => {
                     let t = v.parse::<u16>(); 
@@ -59,6 +62,7 @@ fn main() {
                         },
                         Err(_) => valid = false
                     };
+                    seen.2 = true;
                 },
                 "hgt" => {
                     if v.contains("in") {
@@ -80,6 +84,7 @@ fn main() {
                     } else {
                         valid = false;
                     }
+                    seen.3 = true;
                 },
                 "hcl" => {
                     match v.get(..1) {
@@ -88,12 +93,18 @@ fn main() {
                                 valid = false;
                             } else {
                                 let cs: Vec<char> = v.replace("#", "").chars().collect();
-                                let re = Regex::new("[0-9a-f]").unwrap();
-                                cs.iter().for_each(|c| if !re.is_match(&(c.to_string())) { valid = false});
+                                if cs.len() != 6 { 
+                                    valid = false; 
+                                }
+                                else {
+                                    let re = Regex::new("[0-9a-f]").unwrap();
+                                    cs.iter().for_each(|c| if !re.is_match(&(c.to_string())) { valid = false});
+                                }
                             }
                         },
                         _ => valid = false
                     }
+                    seen.4 = true;
                 },
                 "ecl" => {
                     match v {
@@ -106,6 +117,7 @@ fn main() {
                         "oth" => (),
                         _ => valid = false
                     };
+                    seen.5 = true;
                 },
                 "pid" => {
                     if v.len() != 9 {
@@ -113,10 +125,11 @@ fn main() {
                     } else {
                         let n = v.parse::<u64>();
                         match n {
-                            Ok(n) => (),
+                            Ok(_) => (),
                             Err(_) => valid = false
                         }
                     }
+                    seen.6 = true;
                 },
                 "cid" => (),
                 _ => valid = false
@@ -125,7 +138,7 @@ fn main() {
                 break;
             }
         } 
-        if valid {
+        if valid && seen == (true, true, true, true, true, true, true) {
             soln_2 += 1;
         }
     }
