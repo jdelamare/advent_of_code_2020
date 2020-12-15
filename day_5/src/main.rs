@@ -12,17 +12,47 @@ fn main() {
         parsed_boarding_pass.push(pass.chars().collect());
     }
 
+    let mut seat_ids: Vec<usize> = part1(parsed_boarding_pass);
+
+    part2(&mut seat_ids);
+}
+
+fn part1(parsed_boarding_pass: Vec<Vec<char>>) -> Vec<usize>{
     let mut max = 0;
+    let mut seat_ids: Vec<usize> = vec![];
     for mut pass in parsed_boarding_pass {
         let row = bin_search_row(&mut pass, 0, 127);
         let col = bin_search_col(&mut pass, 0, 7); 
         let seat_id = row * 8 + col;
+        seat_ids.push(seat_id);
         if seat_id > max {
             max = seat_id;
         }
     }
 
     println!("{}", max);
+
+    seat_ids
+}
+
+fn part2(seat_ids: &mut Vec<usize>) {
+    seat_ids.sort();
+    let mut iter = seat_ids.iter().peekable();
+    loop {
+        let curr = match iter.next() {
+            Some(v) => v,
+            None => return
+        };
+
+        let next = match iter.peek() {
+            Some(v) => v,
+            None => return
+        };
+        
+        if **next == *curr + 2 {
+            println!("my seat = {}", *curr + 1);
+        }
+    }
 }
 
 fn bin_search_row(boarding_pass: &mut Vec<char>, lower: usize, upper: usize) -> usize {
